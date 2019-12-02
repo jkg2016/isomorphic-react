@@ -1,2 +1,2 @@
-console.infor("react is cool");
+console.info("react is cool");
 
