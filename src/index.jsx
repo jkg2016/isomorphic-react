@@ -1,10 +1,17 @@
 import App from './App';
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import getStore from './getStore';
+import { Provider } from 'react-redux';
+
+const store = getStore();
+
 
 const render = (_App) => {
     ReactDOM.render(
-        <_App />,
+        <Provider store={store}>
+            <_App />
+        </Provider>,
         document.getElementById('AppContainer')
     )
 };
