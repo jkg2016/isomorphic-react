@@ -6,6 +6,11 @@ import { argv} from 'optimist';
 import {get} from 'request-promise';
 import {questions, question} from '../data/api-real-url' ;
 import {delay} from 'redux-saga';
+import getStore from '../src/getStore';
+import { renderToString } from 'react-dom/server';
+import { Provider } from 'react-redux';
+import React from 'react';
+import App from'../src/App';
 
 
 const port = process.env.PORT || 3000;
@@ -26,6 +31,7 @@ const useServerRender = argv.useServerRender === 'true';
  * OR, just disable useLiveData
  */
 const useLiveData = argv.useLiveData === 'true';
+
 
 /**
  * Returns a response object with an [items] property containing a list of the 30 or so newest questions
@@ -115,6 +121,26 @@ if (process.env.NODE_ENV === 'development')
 }
 app.get(['/'], function * (req, res) {
     let index = yield fs.readFile('./public/index.html',"utf-8");
+
+    const initialState = {
+        questions:[]
+    }
+    const questions = yield getQuestions();
+    initialState.questions = [...questions.items];
+
+    const store = getStore(initialState);
+
+    if (useServerRender){
+        const appRendered = renderToString(
+            <Provider store = {store}>
+                    <App />             
+            </Provider>
+        );
+        index = index.replace(`<%= preloadedApplication %>`, appRendered);
+    } else {
+        index = index.replace(`<%= preloadedApplication %>`,`Please wait while we load the application.`);
+    }
+
     res.send(index);
 })
 
