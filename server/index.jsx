@@ -36,7 +36,7 @@ const useLiveData = argv.useLiveData === "true";
 /**
  * Returns a response object with an [items] property containing a list of the 30 or so newest questions
  */
-function* getQuestions() {
+function * getQuestions() {
   let data;
   if (useLiveData) {
     /**
