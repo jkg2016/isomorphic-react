@@ -4,7 +4,7 @@ import QuestionList from "./components/QuestionList";
 import QuestionDetail from "./components/QuestionDetail";
 import { Route, Link } from "react-router-dom";
 
-const AppDisplay = ({ test }) => (
+const AppDisplay = ({}) => (
   <div>
     <h1>
       <Link to={`/`}>Isomorphic React</Link>
