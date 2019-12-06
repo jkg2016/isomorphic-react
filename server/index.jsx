@@ -1,16 +1,16 @@
 import express from "express";
-import yields from "express-yields";
-import fs from "fs-extra";
-import webpack from "webpack";
-import { argv } from "optimist";
-import { get } from "request-promise";
-import { questions, question } from "../data/api-real-url";
-import { delay } from "redux-saga";
-import getStore from "../src/getStore";
-import { renderToString } from "react-dom/server";
-import { Provider } from "react-redux";
-import React from "react";
-import App from "../src/App";
+import yields from 'express-yields';
+import fs from 'fs-extra';
+import webpack from 'webpack';
+import { argv} from 'optimist';
+import {get} from 'request-promise';
+import {questions, question} from '../data/api-real-url' ;
+import {delay} from 'redux-saga';
+import getStore from '../src/getStore';
+import { renderToString } from 'react-dom/server';
+import { Provider } from 'react-redux';
+import React from 'react';
+import App from'../src/App';
 import { ConnectedRouter } from "react-router-redux";
 import createHistory from "history/createMemoryHistory";
 
@@ -119,39 +119,48 @@ if (process.env.NODE_ENV === "development") {
 
   app.use(require("webpack-hot-middleware")(compiler));
 }
-app.get(["/", "/questions/:id"], function*(req, res) {
-  let index = yield fs.readFile("./public/index.html", "utf-8");
+app.get(['/', '/questions/:id'], function * (req, res) {
+    let index = yield fs.readFile('./public/index.html',"utf-8");
 
-  const history = createHistory({
-    initialEntries: [req.path]
-  });
+    const initialState = {
+        questions:[]
+    }
 
-  const initialState = {
-    questions: []
-  };
+    const history = createHistory({
+        initialEntries: [req.path],
+    })
 
-  const questions = yield getQuestions();
-  initialState.questions = [...questions.items];
+    if(req.params.is){
 
-  const store = getStore(history, initialState);
+        const question_id = req.params.id;
+        const response = yield getQuestion(question_id);
+        const questionDetails = response.items[0];
+        initialState.questions = [{...questionDetails, question_id}];
 
-  if (useServerRender) {
-    const appRendered = renderToString(
-      <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <App />
-        </ConnectedRouter>
-      </Provider>
-    );
-    index = index.replace(`<%= preloadedApplication %>`, appRendered);
-  } else {
-    index = index.replace(
-      `<%= preloadedApplication %>`,
-      `Please wait while we load the application.`
-    );
-  }
+    } else {
+        const questions = yield getQuestions();
+        initialState.questions = [...questions.items];
+    }
 
-  res.send(index);
-});
+
+    const store = getStore(history, initialState);
+
+    if (useServerRender){
+        const appRendered = renderToString(
+
+            <Provider store = {store}>
+                <ConnectedRouter history={history}>
+                    <App />  
+                </ConnectedRouter>           
+            </Provider>
+
+        );
+        index = index.replace(`<%= preloadedApplication %>`, appRendered);
+    } else {
+        index = index.replace(`<%= preloadedApplication %>`,`Please wait while we load the application.`);
+    }
+
+    res.send(index);
+})
 
 app.listen(port, "0.0.0.0", () => console.info(`App listening on ${port}`));
