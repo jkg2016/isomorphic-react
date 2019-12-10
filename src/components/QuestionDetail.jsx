@@ -1,6 +1,6 @@
 import React from "react";
 import Markdown from "react-markdown";
-import TagList from "./TagList";
+import TagsList from "./TagsList";
 import { connect } from "react-redux";
 
 /**
@@ -14,7 +14,7 @@ const QuestionDetailDisplay = ({ title, body, answer_count, tags }) => (
     {body ? (
       <div>
         <div className="mb-3">
-          <TagList tags={tags} />
+          <TagsList tags={tags} />
         </div>
         <Markdown source={body} />
         <div>{answer_count} Answers</div>
